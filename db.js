@@ -6,14 +6,21 @@ const config = {
   password: process.env.DB_PASSWORD,
   server:   process.env.DB_SERVER,
   database: process.env.DB_DATABASE,
-  port:     parseInt(process.env.DB_PORT),
+  port:     parseInt(process.env.DB_PORT) || 1433,
   options: {
     encrypt: true,
-    trustServerCertificate: false
+    trustServerCertificate: false,
+    connectionTimeout: 30000,
+    requestTimeout: 30000
+  },
+  pool: {
+    max: 10,
+    min: 0,
+    idleTimeoutMillis: 30000
   }
 };
 
-let pool; // ✅ Fix #4: singleton pool — one connection reused across all requests
+let pool;
 
 async function getConnection() {
   if (!pool) {
