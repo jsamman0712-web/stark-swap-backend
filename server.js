@@ -13,7 +13,15 @@ const JWT_SECRET = process.env.JWT_SECRET || "starkswap_secret";
 
 console.log("DB_SERVER:", process.env.DB_SERVER);
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://23.254.133.138",
+    "http://23.254.133.138:4000"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
+
 app.use(express.json());
 
 /* HEALTH CHECK */
