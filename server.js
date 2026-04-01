@@ -17,6 +17,7 @@ app.use(cors({
     "http://23.254.133.138",
     "http://23.254.133.138:4000",
     "https://jsamman0712.github.io"
+    "https://stark-swap-backend-1.onrender.com"
   ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
