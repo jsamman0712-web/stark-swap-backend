@@ -12,12 +12,16 @@ const JWT_SECRET = process.env.JWT_SECRET || "starkswap_secret";
 
 console.log("DB_SERVER:", process.env.DB_SERVER);
 
+/* ===========================
+   CORS
+   Only list origins that are BROWSERS hitting this server.
+   Never list the backend's own URL here.
+=========================== */
 app.use(cors({
   origin: [
     "http://23.254.133.138",
     "http://23.254.133.138:4000",
-    "https://jsamman0712.github.io",
-    "https://stark-swap-backend-1.onrender.com"
+    "https://jsamman0712.github.io"
   ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
@@ -148,8 +152,6 @@ app.post("/api/register", async (req, res) => {
 
 /* ===========================
    GET ALL LISTINGS
-   Joins USERS and CATEGORY so frontend gets
-   SellerName and CategoryName in one call
 =========================== */
 app.get("/api/listings", async (req, res) => {
   try {
@@ -182,8 +184,7 @@ app.get("/api/listings", async (req, res) => {
 
 /* ===========================
    GET SINGLE LISTING BY ID
-   Called by item.html?id=XX
-   Returns full details for one listing
+   NOTE: No Status filter here — lets you view Sold/Pending items too
 =========================== */
 app.get("/api/listings/:id", async (req, res) => {
   const listingId = parseInt(req.params.id);
@@ -253,13 +254,13 @@ app.post("/api/listings", async (req, res) => {
   try {
     const pool = await getConnection();
     await pool.request()
-      .input("userId",      sql.Int,          userId)
-      .input("categoryId",  sql.Int,          categoryId)
-      .input("title",       sql.VarChar(255), title)
-      .input("price",       sql.Decimal(10,2),price)
-      .input("condition",   sql.VarChar(50),  condition   || "Good")
-      .input("description", sql.Text,         description || "")
-      .input("status",      sql.VarChar(50),  "Active")
+      .input("userId",      sql.Int,           userId)
+      .input("categoryId",  sql.Int,           categoryId)
+      .input("title",       sql.VarChar(255),  title)
+      .input("price",       sql.Decimal(10,2), price)
+      .input("condition",   sql.VarChar(50),   condition   || "Good")
+      .input("description", sql.Text,          description || "")
+      .input("status",      sql.VarChar(50),   "Active")
       .query(`
         INSERT INTO LISTINGS (UserID, CategoryID, Title, Price, Condition, Description, Status, DatePosted)
         VALUES (@userId, @categoryId, @title, @price, @condition, @description, @status, GETDATE())
@@ -275,8 +276,6 @@ app.post("/api/listings", async (req, res) => {
 
 /* ===========================
    GET MESSAGES FOR A USER
-   Returns all conversations where
-   user is sender OR receiver
 =========================== */
 app.get("/api/messages/:userId", async (req, res) => {
   const userId = parseInt(req.params.userId);
@@ -317,8 +316,6 @@ app.get("/api/messages/:userId", async (req, res) => {
 
 /* ===========================
    SEND A MESSAGE
-   Inserts into MESSAGES table —
-   column is MessageDescription per DB schema
 =========================== */
 app.post("/api/messages", async (req, res) => {
   const { senderId, receiverId, listingId, message } = req.body;
